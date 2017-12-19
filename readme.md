@@ -130,5 +130,7 @@ the main game loop keeps the game running and continually checks for collision w
 
 when you reach the exit, we remove all bad guys and leftover coins, clear out the lists for the coins, walls, bad guys and exit, clear off the stamped blocks from before and make a new maze level to continue play!
 
+# ToDo
+add pylint .rc
 
 
