@@ -1,32 +1,34 @@
 import turtle
 import random
 import math
-# import os
+import winsound
 
 wn = turtle.Screen()
 wn.bgcolor('black')
-wn.title('Star Destroyer')
-#wn.bgpic('maxresdefault.gif')
+wn.title('Simple Turtle Space Game')
+wn.bgpic('maxresdefault.gif')
 
 class Game(turtle.Turtle):
+    """Set up the gamespace and score system"""
     def __init__(self):
         turtle.Turtle.__init__(self)
         self.penup()
         self.hideturtle()
-        self.speed(0)
+        self.speed(0) #draw as fast as possible
         self.color('white')
-        self.goto(-290,310) #just outside boarders
+        self.goto(-290, 310) #just outside boarders
         self.score = 0
     def update_score(self):
         self.clear() #clear old score
-        self.write('Score: {}'.format(self.score),False, align='left', font=('Arial',14,'normal'))
+        self.write('Score: {}'.format(self.score), False, align='left', font=('Arial', 14, 'normal'))
     def change_score(self, points):
         self.score += points
         self.update_score()
-    #def play_sound(self):
-        #os.system('afplay {}&'.format(filename))
+    def play_sound(self):
+        winsound.Beep(2000, 2)
 
 class Border(turtle.Turtle):
+    """Draw the boarder"""
     def __init__(self):
         turtle.Turtle.__init__(self)
         self.penup()
@@ -36,7 +38,7 @@ class Border(turtle.Turtle):
         self.pensize(5)
     def draw_border(self):
         self.penup()
-        self.goto(-300,-300)
+        self.goto(-300, -300)
         self.pendown()
         self.goto(-300, 300)
         self.goto(300, 300)
@@ -44,12 +46,13 @@ class Border(turtle.Turtle):
         self.goto(-300, -300)
 
 class Player(turtle.Turtle):
+    """This defines the player avatar and the possible movements"""
     def __init__(self):
         turtle.Turtle.__init__(self)
         self.penup()
         self.shape('triangle')
         self.color('white')
-        self.speed = (1/2)
+        self.speed = 1
     def move(self):
         self.forward(self.speed)
         #border checking
@@ -64,17 +67,20 @@ class Player(turtle.Turtle):
         self.right(30)
     def increasespeed(self):
         self.speed += (1/4)
+    def decreasespeed(self):
+        self.speed -= (1/4)
 
 class Goal(turtle.Turtle):
+    """Defines the goals for the player to catch"""
     def __init__(self):
         turtle.Turtle.__init__(self)
         self.penup()
         self.speed(0) #animation speed
-        self.color('orange')
+        self.color('yellow')
         self.shape('circle')
-        self.speed = (3/4) #movement speed
-        self.goto(random.randint(-250,250), random.randint(-250,250))
-        self.setheading(random.randint(0,360)) #what direction is it moving initially
+        self.speed = 2 #movement speed
+        self.goto(random.randint(-250, 250), random.randint(-250, 250))
+        self.setheading(random.randint(0, 360)) #what direction is it moving initially
     def jump(self):
         self.goto(random.randint(-250, 250), random.randint(-250, 250))
         self.setheading(random.randint(0, 360))
@@ -88,9 +94,10 @@ class Goal(turtle.Turtle):
 
 #check for collision between goal and player
 def is_collision(p, g):
+    """use pythagorean theorem to measure distance between two objects
+    returns: boolean value based on distance"""
     a = p.xcor()-g.xcor()
     b = p.ycor()-g.ycor()
-    #use pythagorean theorem to measure distance between player and goal
     distance = math.sqrt((a**2)+(b**2))
     if distance < 20:
         return True
@@ -114,6 +121,7 @@ turtle.listen()
 turtle.onkey(player.turnleft, 'Left')
 turtle.onkey(player.turnright, 'Right')
 turtle.onkey(player.increasespeed, 'Up')
+turtle.onkey(player.decreasespeed, 'Down')
 
 #speed up the game
 wn.tracer(0)
@@ -124,9 +132,8 @@ while True:
     player.move()
     for goal in goals:
         goal.move()
-        if is_collision(player,goal):
+        if is_collision(player, goal):
             goal.jump() #goal goes to a random location
             game.change_score(10)
-            #game.play_sound('collision.mp3')
-#add exit to game when score = 100
-
+            game.play_sound()
+            new_score = game.score
