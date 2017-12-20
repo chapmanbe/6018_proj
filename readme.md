@@ -1,4 +1,7 @@
 # Multi-Game Menu with High Scores
+## see the walkthrough at
+https://www.youtube.com/watch?v=khkRhjwNyjk&feature=youtu.be
+
 the purpose of this project is to make multiple simple games in python and tie them together in a game menu
 in that menu you can choose which game to play, to see high scores or to quit
 
