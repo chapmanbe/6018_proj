@@ -1,10 +1,9 @@
 import turtle
 import random
 import math
-import pyaudio
 import time
 import high_score
-import numpy as np
+import beep
 
 wn = turtle.Screen()
 wn.bgcolor('black')
@@ -26,20 +25,6 @@ class Game(turtle.Turtle):
     def change_score(self, points):
         self.score += points
         self.update_score()
-    def beep(volume=0.5, fs=44100, duration=1.0, f=440.0):
-        p = pyaudio.PyAudio()
-        # generate samples, note conversion to float32 array
-        samples = (np.sin(2 * np.pi * np.arange(fs * duration) * f / fs)).astype(np.float32)
-        # for paFloat32 sample values must be in range [-1.0, 1.0]
-        stream = p.open(format=pyaudio.paFloat32,
-                        channels=1,
-                        rate=fs,
-                        output=True)
-        # play. May repeat with different volume values (if done interactively)
-        stream.write(volume * samples)
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
 
 class Border(turtle.Turtle):
     def __init__(self):
@@ -64,7 +49,7 @@ class Player(turtle.Turtle):
         self.penup()
         self.shape('triangle')
         self.color('white')
-        self.speed = 1
+        self.speed = (1/2)
     def move(self):
         self.forward(self.speed)
         #border checking
@@ -89,7 +74,7 @@ class Goal(turtle.Turtle):
         self.speed(0) #animation speed
         self.color('yellow')
         self.shape('circle')
-        self.speed = 3 #movement speed
+        self.speed = (3/2) #movement speed
         # initial location
         self.goto(random.randint(-250, 250), random.randint(-250, 250))
         # what direction is it moving initially
@@ -140,7 +125,7 @@ wn.tracer(0)
 
 start_time = time.time()
 #Main loop
-while time.time()-start_time < 10:
+while time.time()-start_time < 120:
     wn.update() #only update once per loop
     player.move()
     for goal in goals:
@@ -148,7 +133,7 @@ while time.time()-start_time < 10:
         if is_collision(player, goal):
             goal.jump() #goal goes to a random location
             game.change_score(10)
-            game.beep()
+            #beep.beep()
 
 
 new_score = game.score
