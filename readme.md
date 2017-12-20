@@ -7,7 +7,6 @@ within the parent directory there are files for:
 * Game Menu-initial interface (game_interface.py)
 * Maze Game (game_1.py)
 * flying game (game_2.py)
-* High Scores (high_score.py)
 * HighScore file (highscores.pkl)
 * License
 * readme (this)
