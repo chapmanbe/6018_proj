@@ -2,12 +2,9 @@ import turtle
 import random
 import math
 import pyaudio
-import wave
 import time
 import high_score
 import numpy as np
-
-chunk = 1024
 
 wn = turtle.Screen()
 wn.bgcolor('black')
