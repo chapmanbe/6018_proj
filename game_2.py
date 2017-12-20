@@ -1,7 +1,13 @@
 import turtle
 import random
 import math
-import winsound
+import pyaudio
+import wave
+import time
+import high_score
+import numpy as np
+
+chunk = 1024
 
 wn = turtle.Screen()
 wn.bgcolor('black')
@@ -9,7 +15,6 @@ wn.title('Simple Turtle Space Game')
 wn.bgpic('maxresdefault.gif')
 
 class Game(turtle.Turtle):
-    """Set up the gamespace and score system"""
     def __init__(self):
         turtle.Turtle.__init__(self)
         self.penup()
@@ -24,11 +29,22 @@ class Game(turtle.Turtle):
     def change_score(self, points):
         self.score += points
         self.update_score()
-    def play_sound(self):
-        winsound.Beep(2000, 2)
+    def beep(volume=0.5, fs=44100, duration=1.0, f=440.0):
+        p = pyaudio.PyAudio()
+        # generate samples, note conversion to float32 array
+        samples = (np.sin(2 * np.pi * np.arange(fs * duration) * f / fs)).astype(np.float32)
+        # for paFloat32 sample values must be in range [-1.0, 1.0]
+        stream = p.open(format=pyaudio.paFloat32,
+                        channels=1,
+                        rate=fs,
+                        output=True)
+        # play. May repeat with different volume values (if done interactively)
+        stream.write(volume * samples)
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
 
 class Border(turtle.Turtle):
-    """Draw the boarder"""
     def __init__(self):
         turtle.Turtle.__init__(self)
         self.penup()
@@ -46,7 +62,6 @@ class Border(turtle.Turtle):
         self.goto(-300, -300)
 
 class Player(turtle.Turtle):
-    """This defines the player avatar and the possible movements"""
     def __init__(self):
         turtle.Turtle.__init__(self)
         self.penup()
@@ -71,16 +86,17 @@ class Player(turtle.Turtle):
         self.speed -= (1/4)
 
 class Goal(turtle.Turtle):
-    """Defines the goals for the player to catch"""
     def __init__(self):
         turtle.Turtle.__init__(self)
         self.penup()
         self.speed(0) #animation speed
         self.color('yellow')
         self.shape('circle')
-        self.speed = 2 #movement speed
+        self.speed = 3 #movement speed
+        # initial location
         self.goto(random.randint(-250, 250), random.randint(-250, 250))
-        self.setheading(random.randint(0, 360)) #what direction is it moving initially
+        # what direction is it moving initially
+        self.setheading(random.randint(0, 360))
     def jump(self):
         self.goto(random.randint(-250, 250), random.randint(-250, 250))
         self.setheading(random.randint(0, 360))
@@ -92,12 +108,11 @@ class Goal(turtle.Turtle):
         if self.ycor() > 290 or self.ycor() < -290:
             self.left(60)
 
-#check for collision between goal and player
+#check for collision between two objects
 def is_collision(p, g):
-    """use pythagorean theorem to measure distance between two objects
-    returns: boolean value based on distance"""
     a = p.xcor()-g.xcor()
     b = p.ycor()-g.ycor()
+    #use pythagorean theorem to measure distance between player and goal
     distance = math.sqrt((a**2)+(b**2))
     if distance < 20:
         return True
@@ -126,8 +141,9 @@ turtle.onkey(player.decreasespeed, 'Down')
 #speed up the game
 wn.tracer(0)
 
+start_time = time.time()
 #Main loop
-while True:
+while time.time()-start_time < 10:
     wn.update() #only update once per loop
     player.move()
     for goal in goals:
@@ -135,5 +151,10 @@ while True:
         if is_collision(player, goal):
             goal.jump() #goal goes to a random location
             game.change_score(10)
-            game.play_sound()
-            new_score = game.score
+            game.beep()
+
+
+new_score = game.score
+print(new_score)
+high_score.add_new_score(new_score)
+high_score.print_table()
